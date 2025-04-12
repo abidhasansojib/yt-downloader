@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Check if yt-dlp is installed
+if ! command -v yt-dlp &> /dev/null; then
+    pkg install python-yt-dlp
+    exit 1
+fi
+
+# Function to download audio
+download_audio() {
+    yt-dlp -f bestaudio --extract-audio --audio-format mp3 "$1"
+}
+
+# Function to download video
+download_video() {
+    yt-dlp -f bestvideo+bestaudio "$1"
+}
+
+# Parse arguments
+case "$1" in
+    -a)
+        if [ -z "$2" ]; then
+            echo "Usage: yt -a <youtube_url>"
+            exit 1
+        fi
+        download_audio "$2"
+        ;;
+    -v)
+        if [ -z "$2" ]; then
+            echo "Usage: yt -v <youtube_url>"
+            exit 1
+        fi
+        download_video "$2"
+        ;;
+    *)
+        echo "Usage:"
+        echo "  yt -a <youtube_url>  # Download audio"
+        echo "  yt -v <youtube_url>  # Download video"
+        exit 1
+        ;;
+esac
