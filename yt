@@ -1,19 +1,36 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
+
+# Path to save downloads
+TARGET_DIR="/sdcard/yt"
+
+# Check Termux storage permission
+if [ ! -d "/storage/emulated/0" ]; then
+    echo "Requesting Termux storage permissions..."
+    termux-setup-storage
+    sleep 2
+fi
+
+# Check if /sdcard/yt exists, create if not
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "Creating download directory at $TARGET_DIR"
+    mkdir -p "$TARGET_DIR"
+fi
 
 # Check if yt-dlp is installed
 if ! command -v yt-dlp &> /dev/null; then
-    pkg install python-yt-dlp
+    echo "yt-dlp is not installed. Install it with:"
+    echo "pkg install python-yt-dlp"
     exit 1
 fi
 
 # Function to download audio
 download_audio() {
-    yt-dlp -f bestaudio --extract-audio --audio-format mp3 "$1"
+    yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "$TARGET_DIR/%(title)s.%(ext)s" "$1"
 }
 
 # Function to download video
 download_video() {
-    yt-dlp -f bestvideo+bestaudio "$1"
+    yt-dlp -f bestvideo+bestaudio -o "$TARGET_DIR/%(title)s.%(ext)s" "$1"
 }
 
 # Parse arguments
